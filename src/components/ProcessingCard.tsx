@@ -10,7 +10,7 @@ export const ProcessingCard: React.FC<ProcessingCardProps> = ({ file }) => {
   const getStatusIcon = () => {
     switch (file.status.status) {
       case 'completed':
-        return <CheckCircle className="text-green-500\" size={20} />;
+        return <CheckCircle className="text-green-500" size={20} />;
       case 'error':
         return <AlertCircle className="text-red-500" size={20} />;
       default:

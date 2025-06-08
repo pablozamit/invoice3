@@ -5,6 +5,7 @@ import { ProcessingCard } from './components/ProcessingCard';
 import { StatsCard } from './components/StatsCard';
 import { AuthButton } from './components/AuthButton';
 import { useInvoiceProcessor } from './hooks/useInvoiceProcessor';
+import { ExchangeRateInput } from './components/ExchangeRateInput';
 
 function App() {
   const { files, isProcessing, addFiles, clearAll, stats } = useInvoiceProcessor();
@@ -114,7 +115,7 @@ function App() {
         {/* Integration Info */}
         <div className="mt-12 bg-white rounded-xl border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Configuración de integración</h3>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             <div>
               <h4 className="font-medium text-gray-800 mb-2">Google Sheets</h4>
               <p className="text-sm text-gray-600 mb-2">
@@ -134,7 +135,7 @@ function App() {
               <p className="text-sm text-gray-600 mb-2">
                 Los archivos se subirán automáticamente a:
               </p>
-              <a 
+              <a
                 href="https://drive.google.com/drive/u/2/folders/12ZY6kw2qBUQtXyz8qtcLuCYHCQKaZ3v6"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -142,6 +143,13 @@ function App() {
               >
                 Ver carpeta de Drive →
               </a>
+            </div>
+            <div>
+              <h4 className="font-medium text-gray-800 mb-2">Tipo de cambio</h4>
+              <p className="text-sm text-gray-600 mb-2">
+                Define manualmente el cambio de USD a EUR:
+              </p>
+              <ExchangeRateInput />
             </div>
           </div>
         </div>
@@ -168,16 +176,8 @@ function App() {
 {`VITE_GOOGLE_API_KEY=tu_api_key_aqui
 VITE_GOOGLE_CLIENT_ID=tu_client_id_aqui
 VITE_GOOGLE_SHEETS_ID=1T-nRJLZILYqu6Xubq74QjFrf5ep4mZWCp-UNdaLozZ0
-VITE_GOOGLE_DRIVE_FOLDER_ID=12ZY6kw2qBUQtXyz8qtcLuCYHCQKaZ3v6
-VITE_EXCHANGE_RATE_API_KEY=tu_exchange_rate_api_key`}
+VITE_GOOGLE_DRIVE_FOLDER_ID=12ZY6kw2qBUQtXyz8qtcLuCYHCQKaZ3v6`}
               </pre>
-            </div>
-
-            <div>
-              <h4 className="font-medium text-gray-800 mb-2">3. API de conversión de moneda</h4>
-              <p className="text-sm text-gray-600">
-                Registrarse en <a href="https://exchangerate-api.com" className="text-blue-600 underline" target="_blank">ExchangeRate-API</a> para obtener una API key gratuita.
-              </p>
             </div>
           </div>
         </div>
@@ -198,9 +198,9 @@ VITE_EXCHANGE_RATE_API_KEY=tu_exchange_rate_api_key`}
             <div className="mx-auto w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
               <TrendingUp className="text-green-600" size={24} />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Conversión de Moneda Real</h3>
+            <h3 className="font-semibold text-gray-900 mb-2">Conversión de Moneda Manual</h3>
             <p className="text-sm text-gray-600">
-              Conversión automática a euros con tipos de cambio actualizados en tiempo real
+              Define el tipo de cambio USD/EUR directamente en la interfaz
             </p>
           </div>
           
