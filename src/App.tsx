@@ -6,6 +6,7 @@ import { StatsCard } from './components/StatsCard';
 import { AuthButton } from './components/AuthButton';
 import { useInvoiceProcessor } from './hooks/useInvoiceProcessor';
 import { ExchangeRateInput } from './components/ExchangeRateInput';
+import { ConfigurationPanel } from './components/ConfigurationPanel';
 
 function App() {
   const { files, isProcessing, addFiles, clearAll, stats } = useInvoiceProcessor();
@@ -50,7 +51,6 @@ function App() {
             <ol className="list-decimal list-inside space-y-2 ml-4">
               <li>Crear un archivo <code className="bg-amber-100 px-2 py-1 rounded">.env</code> basado en <code className="bg-amber-100 px-2 py-1 rounded">.env.example</code></li>
               <li>Configurar las APIs de Google (Sheets, Drive, Cloud Vision)</li>
-              <li>Obtener una API key para conversión de moneda</li>
               <li>Hacer clic en "Conectar con Google" para autorizar el acceso</li>
             </ol>
             <p className="mt-3 font-medium">
@@ -122,7 +122,7 @@ function App() {
                 Los datos se guardarán automáticamente en tu hoja de cálculo:
               </p>
               <a 
-                href="https://docs.google.com/spreadsheets/d/1T-nRJLZILYqu6Xubq74QjFrf5ep4mZWCp-UNdaLozZ0/edit?usp=sharing"
+                href={`https://docs.google.com/spreadsheets/d/${import.meta.env.VITE_GOOGLE_SHEETS_ID}/edit`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-800 text-sm underline"
@@ -136,7 +136,7 @@ function App() {
                 Los archivos se subirán automáticamente a:
               </p>
               <a
-                href="https://drive.google.com/drive/u/2/folders/12ZY6kw2qBUQtXyz8qtcLuCYHCQKaZ3v6"
+                href={`https://drive.google.com/drive/folders/${import.meta.env.VITE_GOOGLE_DRIVE_FOLDER_ID}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-800 text-sm underline"
@@ -152,6 +152,11 @@ function App() {
               <ExchangeRateInput />
             </div>
           </div>
+        </div>
+
+        {/* User Configuration Panel */}
+        <div className="mt-12"> {/* Adjusted margin to mt-12 to be consistent with other major sections */}
+          <ConfigurationPanel />
         </div>
 
         {/* Setup Guide */}
@@ -175,9 +180,17 @@ function App() {
               <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto">
 {`VITE_GOOGLE_API_KEY=tu_api_key_aqui
 VITE_GOOGLE_CLIENT_ID=tu_client_id_aqui
-VITE_GOOGLE_SHEETS_ID=1T-nRJLZILYqu6Xubq74QjFrf5ep4mZWCp-UNdaLozZ0
-VITE_GOOGLE_DRIVE_FOLDER_ID=12ZY6kw2qBUQtXyz8qtcLuCYHCQKaZ3v6`}
+VITE_GOOGLE_SHEETS_ID=tu_id_de_hoja_de_calculo_aqui
+VITE_GOOGLE_DRIVE_FOLDER_ID=tu_id_de_carpeta_de_drive_aqui
+VITE_GOOGLE_CLOUD_API_KEY=tu_api_key_cloud_vision_aqui
+VITE_GOOGLE_CLOUD_PROJECT_ID=tu_project_id_cloud_aqui`}
               </pre>
+              <p className="text-sm text-gray-600 mt-4">
+                <strong>Nota Importante:</strong> El <code>VITE_GOOGLE_SHEETS_ID</code> y <code>VITE_GOOGLE_DRIVE_FOLDER_ID</code> también pueden ser configurados
+                directamente en la interfaz gráfica, en la sección "Configuración Personalizada" (arriba de esta guía).
+                Los valores guardados en la interfaz tendrán prioridad sobre los definidos en el archivo <code>.env</code> para estos dos campos específicos.
+                El resto de variables (API Keys, Client ID, Project ID) <strong>deben</strong> ser configuradas en el archivo <code>.env</code>.
+              </p>
             </div>
           </div>
         </div>

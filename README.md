@@ -9,6 +9,8 @@ npm install
 ```
 
 Copia `.env.example` a `.env` y completa las credenciales de Google.
+Algunas configuraciones, como los IDs de Google Sheet y Drive Folder, también se pueden gestionar desde la interfaz de la aplicación después del inicio.
+Consulta la guía de configuración dentro de la aplicación para más detalles.
 
 ## Uso
 

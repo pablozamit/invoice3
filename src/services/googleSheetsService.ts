@@ -1,5 +1,6 @@
 import { InvoiceData } from '../types/invoice';
 import { GoogleAuthService } from './googleAuth';
+import { loadSheetId } from './configService';
 
 export class GoogleSheetsService {
   private static instance: GoogleSheetsService;
@@ -23,10 +24,15 @@ export class GoogleSheetsService {
         throw new Error('Google API client not initialized');
       }
 
-      const spreadsheetId = import.meta.env.VITE_GOOGLE_SHEETS_ID;
+      const userDefinedSheetId = loadSheetId();
+      const spreadsheetId = userDefinedSheetId || import.meta.env.VITE_GOOGLE_SHEETS_ID;
+
+      if (!spreadsheetId) {
+        throw new Error('Google Sheet ID is not configured. Please set it in the .env file or in the application settings.');
+      }
 
       // First, check for duplicates
-      const isDuplicate = await this.checkForDuplicate(data.numeroFactura, data.empresa);
+      const isDuplicate = await this.checkForDuplicate(data.numeroFactura, data.empresa, spreadsheetId);
       if (isDuplicate) {
         throw new Error(`Ya existe una factura con el número ${data.numeroFactura} de la empresa ${data.empresa}`);
       }
@@ -66,13 +72,14 @@ export class GoogleSheetsService {
     }
   }
 
-  private async checkForDuplicate(invoiceNumber: string, company: string): Promise<boolean> {
+  private async checkForDuplicate(invoiceNumber: string, company: string, sheetId: string): Promise<boolean> {
+    // sheetId is now passed as a parameter, already resolved by the calling function
     try {
       const client = this.authService.getClient();
-      const spreadsheetId = import.meta.env.VITE_GOOGLE_SHEETS_ID;
+      // const spreadsheetId = import.meta.env.VITE_GOOGLE_SHEETS_ID; // No longer needed here
 
       const response = await client.sheets.spreadsheets.values.get({
-        spreadsheetId,
+        spreadsheetId: sheetId,
         range: 'A:C' // Check columns A (fecha), B (numeroFactura), C (empresa)
       });
 
@@ -97,7 +104,18 @@ export class GoogleSheetsService {
     try {
       await this.authService.signIn();
       const client = this.authService.getClient();
-      const spreadsheetId = import.meta.env.VITE_GOOGLE_SHEETS_ID;
+
+      const userDefinedSheetId = loadSheetId();
+      const spreadsheetId = userDefinedSheetId || import.meta.env.VITE_GOOGLE_SHEETS_ID;
+
+      if (!spreadsheetId) {
+        // For initialization, we might not want to throw an error hard,
+        // as the app might load before .env or config is fully set.
+        // However, other operations will fail. For now, let's log and return.
+        // Or, decide if init should also throw if no ID. For consistency, let's throw.
+        console.error('Google Sheet ID is not configured. Cannot initialize sheet.');
+        throw new Error('Google Sheet ID is not configured. Please set it in the .env file or in the application settings.');
+      }
 
       // Check if headers exist, if not, add them
       const response = await client.sheets.spreadsheets.values.get({
@@ -123,7 +141,7 @@ export class GoogleSheetsService {
 
         await client.sheets.spreadsheets.values.update({
           spreadsheetId,
-          range: 'A1:K1',
+          range: 'A1:K1', // Ensure this matches your header length
           valueInputOption: 'USER_ENTERED',
           resource: {
             values: [headers]

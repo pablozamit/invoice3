@@ -1,4 +1,5 @@
 import { GoogleAuthService } from './googleAuth';
+import { loadDriveFolderId } from './configService';
 
 export class GoogleDriveService {
   private static instance: GoogleDriveService;
@@ -22,7 +23,12 @@ export class GoogleDriveService {
         throw new Error('Google API client not initialized');
       }
 
-      const folderId = import.meta.env.VITE_GOOGLE_DRIVE_FOLDER_ID;
+      const userDefinedDriveFolderId = loadDriveFolderId();
+      const folderId = userDefinedDriveFolderId || import.meta.env.VITE_GOOGLE_DRIVE_FOLDER_ID;
+
+      if (!folderId) {
+        throw new Error('Google Drive Folder ID is not configured. Please set it in the .env file or in the application settings.');
+      }
 
       // Convert file to base64
       const fileContent = await this.fileToBase64(file);
