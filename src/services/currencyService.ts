@@ -9,8 +9,20 @@ export class CurrencyService {
   private rates: ExchangeRates = {};
   private lastUpdate: Date | null = null;
   private readonly API_URL = 'https://api.exchangerate-api.com/v4/latest/EUR';
+  private manualRates: ExchangeRates = {};
 
-  private constructor() {}
+  private constructor() {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('manualExchangeRates');
+      if (stored) {
+        try {
+          this.manualRates = JSON.parse(stored);
+        } catch {
+          this.manualRates = {};
+        }
+      }
+    }
+  }
 
   static getInstance(): CurrencyService {
     if (!CurrencyService.instance) {
@@ -41,6 +53,12 @@ export class CurrencyService {
   async convertToEUR(amount: number, fromCurrency: string): Promise<number> {
     if (fromCurrency === 'EUR' || fromCurrency === '€') {
       return amount;
+    }
+
+    const manualRate = this.manualRates[fromCurrency.toUpperCase()];
+    if (manualRate) {
+      // manualRate is EUR per unit of the foreign currency
+      return amount * manualRate;
     }
 
     // Update rates if they're older than 1 hour or don't exist
@@ -74,5 +92,16 @@ export class CurrencyService {
     }
 
     return 'EUR'; // Default to EUR
+  }
+
+  setManualRate(currency: string, rate: number): void {
+    this.manualRates[currency.toUpperCase()] = rate;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('manualExchangeRates', JSON.stringify(this.manualRates));
+    }
+  }
+
+  getManualRate(currency: string): number | undefined {
+    return this.manualRates[currency.toUpperCase()];
   }
 }
